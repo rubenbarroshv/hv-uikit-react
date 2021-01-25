@@ -1,29 +1,35 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
-    "lib": ["es6", "dom"],
-    "jsx": "react",
+    "target": "esnext",
+    "jsx": "preserve",
     "esModuleInterop": true,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "noEmit": true,
     "experimentalDecorators": true,
     "baseUrl": "./",
     "allowSyntheticDefaultImports": true,
     "noErrorTruncation": true,
-    "allowJs": true,
     "paths": {
       "@hv/uikit-react-core": ["./packages/core/src"],
       "@hv/uikit-react-core/dist/*": ["./packages/core/src/*"],
       "@hv/uikit-react-icons": ["./packages/core/bin"],
       "@hv/uikit-react-icons/dist/*": ["./packages/icons/bin/*"]
     },
+    // Tells TypeScript to read JS files, as
+    // normally they are ignored as source files
+    "allowJs": false,
+    // Ensure that .d.ts files are created by tsc, but not .js files
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    // Ensure that Babel can safely transpile files in the TypeScript project
+    "isolatedModules": true,
     "noUnusedLocals": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "skipLibCheck": true
   },
-  "exclude": ["**/dist/"]
+  "exclude": ["**/node_modules", "**/dist", "**/tests", "**/stories"]
 }

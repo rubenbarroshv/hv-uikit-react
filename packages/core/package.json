@@ -20,14 +20,14 @@
     "url": "https://github.com/pentaho/hv-uikit-react.git"
   },
   "scripts": {
-    "build": "npx npm-run-all --npm-path npm --serial clean build:babel build:post:**",
+    "build": "npx npm-run-all --npm-path npm --serial clean ts build:babel build:post:**",
     "build:babel": "npx npm-run-all --npm-path npm --parallel build:babel:*",
-    "build:babel:node": "BABEL_ENV=commonjs npx babel --root-mode upward src -d dist --extensions '.js,.jsx' --source-maps --ignore '**/tests','**/stories' --copy-files --no-copy-ignored",
-    "build:babel:legacy": "BABEL_ENV=legacy npx babel --root-mode upward src -d dist/legacy --extensions '.js,.jsx' --source-maps --ignore '**/tests','**/stories' --copy-files --no-copy-ignored",
-    "build:babel:modern": "BABEL_ENV=modern npx babel --root-mode upward src -d dist/modern --extensions '.js,.jsx' --source-maps --ignore '**/tests','**/stories' --copy-files --no-copy-ignored",
-    "build:post:clean-snapshots": "npx del-cli **/dist/**/tests",
+    "build:babel:node": "BABEL_ENV=commonjs npx babel --root-mode upward src -d dist --extensions '.js,.jsx,.ts,.tsx' --source-maps --ignore '**/tests','**/stories','**/*.d.ts' --copy-files",
+    "build:babel:legacy": "BABEL_ENV=legacy npx babel --root-mode upward src -d dist/legacy --extensions '.js,.jsx,.ts,.tsx' --source-maps --ignore '**/tests','**/stories','**/*.d.ts' --copy-files",
+    "build:babel:modern": "BABEL_ENV=modern npx babel --root-mode upward src -d dist/modern --extensions '.js,.jsx,.ts,.tsx' --source-maps --ignore '**/tests','**/stories','**/*.d.ts' --copy-files",
+    "build:post:clean-snapshots": "npx del-cli **/dist/**/tests **/dist/**/stories",
     "dev": "npx npm-run-all --npm-path npm clean dev:babel:watch",
-    "dev:babel:watch": "BABEL_ENV=commonjs npx babel --root-mode upward src -d dist --extensions '.js,.jsx' --source-maps --ignore '**/tests','**/stories' --copy-files --no-copy-ignored --watch",
+    "dev:babel:watch": "BABEL_ENV=commonjs npx babel --root-mode upward src -d dist --extensions '.js,.jsx,.ts,.tsx' --source-maps --ignore '**/tests','**/stories' --watch",
     "clean": "npx del-cli dist",
     "test": "jest -c config/jest-config.js --coverage",
     "test:watch": "jest -c config/jest-config.js --watch",
@@ -36,7 +36,7 @@
     "link": "npm link",
     "lint:prettier": "npx prettier --config ../../prettier.config.js --check \"src/**/*.js\"",
     "license-check": "node ../../scripts/license-check.cjs ../../config/license-check.json",
-    "ts-check": "npx tsc -p ."
+    "ts": "npx tsc"
   },
   "peerDependencies": {
     "@material-ui/core": "^4.11.0",

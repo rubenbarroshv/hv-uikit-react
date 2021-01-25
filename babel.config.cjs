@@ -33,6 +33,7 @@ module.exports = (api) => {
       },
     ],
     "@babel/preset-react",
+    "@babel/preset-typescript",
   ];
 
   const plugins = [
