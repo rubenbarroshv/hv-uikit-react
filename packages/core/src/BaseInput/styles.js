@@ -5,6 +5,18 @@ const styles = (theme) => ({
     display: "inline-block",
     width: "100%",
     position: "relative",
+    "& $input": {
+      width: `calc(100% - ${theme.hv.spacing.sm}px)`,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      "&:hover": {
+        width: `calc(100% - 40px)`,
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+      },
+    },
     "& $inputRootMultiline": {
       overflow: "auto",
       border: "none",
@@ -124,6 +136,11 @@ const styles = (theme) => ({
     width: "100%",
     borderRadius: "2px",
     backgroundColor: theme.hv.palette.atmosphere.atmo1,
+    "&:focus-within": {
+      "& $input": {
+        width: `calc(100% - 40px)`,
+      },
+    },
   },
   inputRootFocused: {
     background: theme.hv.palette.atmosphere.atmo1,
