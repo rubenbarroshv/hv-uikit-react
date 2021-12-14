@@ -1,8 +1,6 @@
-const styles = (theme) => ({
-  root: {
-    marginTop: theme.hvSpacing(2),
-  },
+const styles = {
+  root: {},
   elements: {},
-});
+};
 
 export default styles;

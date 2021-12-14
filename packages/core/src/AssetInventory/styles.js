@@ -18,7 +18,7 @@ const styles = (theme) => ({
   },
   multiButtons: {
     [theme.breakpoints.up("md")]: {
-      paddingLeft: theme.hvSpacing("sm"),
+      paddingLeft: `${theme.spacing(4)}px`,
     },
     [theme.breakpoints.down("sm")]: {
       paddingLeft: `${theme.spacing(2)}px`,
@@ -30,8 +30,7 @@ const styles = (theme) => ({
     marginTop: 0,
   },
   bulkActions: {
-    marginTop: 5, // 15px is already given by the grid, we just need to add 5 here
-    marginBottom: 0,
+    margin: theme.hvSpacing("sm", 0, 0),
   },
 });
 
