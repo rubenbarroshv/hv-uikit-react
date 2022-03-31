@@ -11,6 +11,10 @@ import {
   HvCardContent,
   HvCardHeader,
   HvGrid,
+  HvInput,
+  HvDropdown,
+  HvMultiButton,
+  HvButton,
 } from "@hitachivantara/uikit-react-core";
 import {
   Cards,
@@ -27,7 +31,7 @@ import {
   Preview,
   Upload,
 } from "@hitachivantara/uikit-react-icons";
-
+import { useGlobalFilter } from "react-table";
 import {
   HvTable,
   HvTableContainer,
@@ -37,6 +41,7 @@ import {
   HvTableBody,
   HvTableCell,
   useHvTable,
+  useHvSortBy,
 } from "../..";
 
 import { makeData, getColumns, getGroupedRowsColumns, useToggleIndex } from "./utils";
@@ -381,10 +386,21 @@ ResponsiveTable.parameters = {
 export const AssetInventory = () => {
   const data = useMemo(() => makeData(6), []);
 
-  const { prepareRow, rows } = useHvTable({
-    data,
-  });
+  const instance = useHvTable(
+    {
+      data,
+    },
+    useGlobalFilter,
+  ); // Review name of this hook
 
+// useHvSortby is useless for views that are not a table, maybe it should be reworked or be done manually.
+// useHvAssetInventory -> provides current view information to render and a method to switch views. maybe some other functionality?
+// maybe create a view switcher component?
+// create a HvListRow | HvAssetListRow that can be used as an alternative to create a table
+// create control panel with search sorting and maybe the view switcher
+// showcase this with a completely assembled exampled
+// create widget that helps compose in a closed manner all the piece to speedup development
+// maybe create a "default card"
   const useStyles = makeStyles((theme) => ({
     item: {
       padding: theme.hvSpacing(0, 0, "sm", 0),
@@ -408,6 +424,24 @@ export const AssetInventory = () => {
     },
     icon: {
       margin: theme.hvSpacing(0, "xs"),
+    },
+    search: {
+      justifyContent: "flex-end",
+    },
+    rightControls: {
+      flexWrap: "nowrap",
+      justifyContent: "space-between",
+    },
+    sortContainer: {
+      flexWrap: "nowrap",
+    },
+    multiButtons: {
+      [theme.breakpoints.up("md")]: {
+        paddingLeft: theme.hvSpacing("sm"),
+      },
+      [theme.breakpoints.down("sm")]: {
+        paddingLeft: `${theme.spacing(2)}px`,
+      },
     },
   }));
 
@@ -442,74 +476,126 @@ export const AssetInventory = () => {
     }
   };
 
+  const views = [
+    { id: "card-button", icon: <Cards />, "aria-label": "Select card view" },
+    { id: "list-button", icon: <List />, "aria-label": "Select list view" },
+  ]; // this structure is maybe the api for the hook
+
   const classes = useStyles();
+
+  const onSearchHandler = (value) => {
+    instance.setGlobalFilter(value);
+  };
 
   return (
     <div style={{ padding: "30px" }}>
       <HvGrid container xs={12}>
-        {rows.map((row) => {
-          prepareRow(row);
-          const { Icon, sema } = getStatus(row.cells[6].value);
-          return (
-            <HvGrid key={row.cells[0].value} item xs={12} sm={6} md={3}>
-              <HvCard
-                selectable
-                bgcolor="atmo1"
-                statusColor={severityKey[row.cells[6].value]}
-                icon={<Icon semantic={sema} />}
-              >
-                <HvCardHeader title={row.cells[1].value} />
-                <HvCardContent>
-                  <HvGrid item container xs={12}>
-                    <HvGrid item xs={4} sm={8} md={12} lg={12} xl={12}>
-                      <div className={classes.kpis}>
-                        <HvTypography className={classes.timestamp}>
-                          {row.cells[2].value}
-                        </HvTypography>
-                        <HvTypography>{row.cells[6].value}</HvTypography>
-                      </div>
-                    </HvGrid>
-                  </HvGrid>
-                  <HvGrid item container xs={12}>
-                    <HvGrid item xs={5} className={classes.bottomItem}>
-                      <HvTypography variant="highlightText">Event Type</HvTypography>
-                      <HvTypography variant="normalText" noWrap>
-                        {row.cells[3].value}
-                      </HvTypography>
-                    </HvGrid>
-                    <HvGrid item xs={7} className={classes.bottomItem}>
-                      <HvTypography variant="highlightText">Status</HvTypography>
-                      <HvTypography variant="normalText" noWrap>
-                        {row.cells[4].value}
-                      </HvTypography>
-                    </HvGrid>
-                    <HvGrid item xs={5} className={classes.bottomItem}>
-                      <HvTypography variant="highlightText">Risk</HvTypography>
-                      <HvTypography variant="normalText" noWrap>
-                        {row.cells[5].value}
-                      </HvTypography>
-                    </HvGrid>
-                    <HvGrid item xs={7} className={classes.bottomItem}>
-                      <HvTypography variant="highlightText">Priority</HvTypography>
-                      <HvTypography variant="normalText" noWrap>
-                        {row.cells[7].value}
-                      </HvTypography>
-                    </HvGrid>
-                  </HvGrid>
-                </HvCardContent>
-                <HvActionBar aria-label="Leaf">
-                  <HvCheckBox
-                    checked={data.checked}
-                    value={data.id}
-                    inputProps={{ "aria-label": `Select ${data.id}` }}
-                  />
-                  <div style={{ flex: 1 }} />
-                  <HvActionsGeneric id={data.id} actions={myActions} maxVisibleActions={1} />
-                </HvActionBar>
-              </HvCard>
+        <HvGrid item container xs={12} justifyContent="space-between">
+          <HvGrid xs={12} sm={6} md={4} lg={3} xl={3} item>
+            <HvInput
+              id="asset-inventory"
+              type="search"
+              placeholder="enter value"
+              role="search"
+              aria-label="search input"
+              value={instance.globalFilter}
+              onChange={(event, value) => onSearchHandler?.(value)}
+            />
+          </HvGrid>
+          <HvGrid xs={12} sm={6} md={4} lg={3} xl={3} item>
+            <HvGrid className={classes.rightControls} container alignItems="flex-end" spacing={0}>
+              <HvGrid className={classes.sortContainer} item xs>
+                <HvDropdown
+                  id="sort-inventory"
+                  values={[
+                    { label: "value 1" },
+                    { label: "value 2" },
+                    { label: "value 3" },
+                    { label: "value 4" },
+                  ]}
+                  singleSelectionToggle={false}
+                  disablePortal
+                />
+              </HvGrid>
+              <HvGrid item>
+                <div className={classes.multiButtons}>
+                  <HvMultiButton id="asset-view-changer">
+                    {views.map(({ id: btnId, icon, ...others }, idx) => (
+                      <HvButton id={btnId} key={btnId} icon {...others}>
+                        {icon}
+                      </HvButton>
+                    ))}
+                  </HvMultiButton>
+                </div>
+              </HvGrid>
             </HvGrid>
-          );
-        })}
+          </HvGrid>
+        </HvGrid>
+        <HvGrid item container xs={12}>
+          {instance.rows.map((row) => {
+            instance.prepareRow(row);
+            const { Icon, sema } = getStatus(row.cells[6].value);
+            return (
+              <HvGrid key={row.cells[0].value} item xs={12} sm={6} md={3}>
+                <HvCard
+                  selectable
+                  bgcolor="atmo1"
+                  statusColor={severityKey[row.cells[6].value]}
+                  icon={<Icon semantic={sema} />}
+                >
+                  <HvCardHeader title={row.cells[1].value} />
+                  <HvCardContent>
+                    <HvGrid item container xs={12}>
+                      <HvGrid item xs={4} sm={8} md={12} lg={12} xl={12}>
+                        <div className={classes.kpis}>
+                          <HvTypography className={classes.timestamp}>
+                            {row.cells[2].value}
+                          </HvTypography>
+                          <HvTypography>{row.cells[6].value}</HvTypography>
+                        </div>
+                      </HvGrid>
+                    </HvGrid>
+                    <HvGrid item container xs={12}>
+                      <HvGrid item xs={5} className={classes.bottomItem}>
+                        <HvTypography variant="highlightText">Event Type</HvTypography>
+                        <HvTypography variant="normalText" noWrap>
+                          {row.cells[3].value}
+                        </HvTypography>
+                      </HvGrid>
+                      <HvGrid item xs={7} className={classes.bottomItem}>
+                        <HvTypography variant="highlightText">Status</HvTypography>
+                        <HvTypography variant="normalText" noWrap>
+                          {row.cells[4].value}
+                        </HvTypography>
+                      </HvGrid>
+                      <HvGrid item xs={5} className={classes.bottomItem}>
+                        <HvTypography variant="highlightText">Risk</HvTypography>
+                        <HvTypography variant="normalText" noWrap>
+                          {row.cells[5].value}
+                        </HvTypography>
+                      </HvGrid>
+                      <HvGrid item xs={7} className={classes.bottomItem}>
+                        <HvTypography variant="highlightText">Priority</HvTypography>
+                        <HvTypography variant="normalText" noWrap>
+                          {row.cells[7].value}
+                        </HvTypography>
+                      </HvGrid>
+                    </HvGrid>
+                  </HvCardContent>
+                  <HvActionBar aria-label="Leaf">
+                    <HvCheckBox
+                      checked={data.checked}
+                      value={data.id}
+                      inputProps={{ "aria-label": `Select ${data.id}` }}
+                    />
+                    <div style={{ flex: 1 }} />
+                    <HvActionsGeneric id={data.id} actions={myActions} maxVisibleActions={1} />
+                  </HvActionBar>
+                </HvCard>
+              </HvGrid>
+            );
+          })}
+        </HvGrid>
       </HvGrid>
     </div>
   );
